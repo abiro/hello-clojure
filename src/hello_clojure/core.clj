@@ -4,13 +4,18 @@
     [clojure.data.json :as json]
     [clj-http.client :as client]))
 
-(def api-url "https://api.github.com/users/abiro")
+(defn github-api-for-user [user-name]
+  (str "https://api.github.com/users/" user-name))
 
 (defn -main
-  "Query an API and get a value from the JSON"
+  "Query Github API for a user's real name"
   [& args]
-  (let [body (:body (client/get api-url))
-        result (json/read-str body)]
-    (println "This Github user is called" (get result "name"))))
+  (let [user-name (first args)
+        body (:body (client/get (github-api-for-user user-name)))
+        result (json/read-str body)
+        real-name (get result "name")]
+    (if (nil? real-name)
+      (println "This Github user has not made their name public")
+      (println "This Github user is called" real-name))))
 
 
